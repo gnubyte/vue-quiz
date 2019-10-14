@@ -1,5 +1,7 @@
 # testapp
 
+https://youtu.be/4deVCNJq3qc?t=5412
+
 ## Project setup
 ```
 yarn install
