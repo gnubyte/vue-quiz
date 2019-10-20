@@ -1,6 +1,6 @@
 <template>
     <div class="container question-box">
-        <b-jumbotron header="Openmobo" lead="Giving you back your data">
+        <b-jumbotron header="Openmobo   Quiz App" lead="Giving you back your data">
             <template slot="lead">
                 {{ currentQuestion.question }}
             </template>
@@ -9,7 +9,7 @@
                     <b-list-group-item v-for="(answer, index) in answers" 
                     :key="index" 
                     @click="selectAnswer(index)"
-                    :class="[selectedIndex === index ? 'selected' : '']"
+                    :class="answerClass(index)"
                     >
                         {{ answer }}    
                     </b-list-group-item>
@@ -18,7 +18,7 @@
                 variant="success" 
                 href="#"
                 @click="submitAnswer"
-                :disabled="selectedIndex === null"
+                :disabled="selectedIndex === null || answered"
             >
                 Submit Answer
             </b-button>
@@ -46,7 +46,10 @@ import _ from 'lodash'
         data() {
             return {
                 selectedIndex: null,
-                shuffledAnswers: []
+                correctIndex: null,
+                shuffledAnswers: [],
+                answered: false
+
             }
         },
         computed: {
@@ -65,11 +68,24 @@ import _ from 'lodash'
                 if (this.selectedIndex === this.correctIndex){
                     isCorrect = true
                 }
+                this.answered = true
                 this.increment(isCorrect)
             },
             shuffleAnswers(){
                 let answers = [...this.currentQuestion.incorrect_answers, this.currentQuestion.correct_answer]
                 this.shuffledAnswers = _.shuffle(answers)
+                this.correctIndex = this.shuffledAnswers.indexOf(this.currentQuestion.correct_answer)
+            },
+            answerClass(index){
+                let answerClass =''
+                if (!this.answered && this.selectedIndex === index){
+                    answerClass='selected'
+                } else if (this.answered && this.correctIndex === index){
+                    answerClass = 'correct'
+                } else if (this.answered && this.correctIndex !== index){
+                    answerClass = 'incorrect'
+                }
+                return answerClass
             }
         },
         watch: {
@@ -77,6 +93,7 @@ import _ from 'lodash'
                 immediate: true,
                 handler() {
                     this.selectedIndex = null
+                    this.answered = false
                     this.shuffleAnswers()
                 }
             }
